@@ -9,6 +9,13 @@ app = Flask(__name__)
 model = joblib.load('upi_classifier_model.pkl')
 vectorizer = joblib.load('tfidf_vectorizer.pkl')
 
+@app.route('/' , methods=['GET'])
+def home():
+    """
+    Home page
+    """
+    return "Welcome to the UPI classification model!"
+
 @app.route('/predict', methods=['POST'])
 def predict():
     """
