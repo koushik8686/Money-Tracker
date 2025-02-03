@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+from Amount import UPIMessageExtractor
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -8,6 +9,9 @@ app = Flask(__name__)
 # Load the saved model and vectorizer
 model = joblib.load('upi_classifier_model.pkl')
 vectorizer = joblib.load('tfidf_vectorizer.pkl')
+
+# Initialize the message extractor
+message_extractor = UPIMessageExtractor()
 
 @app.route('/' , methods=['GET'])
 def home():
@@ -43,6 +47,28 @@ def predict():
             'prediction': str(prediction),
             'confidence': str(float(max_prob))
         })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/extract_details', methods=['POST'])
+def extract_details():
+    """
+    Endpoint to extract sender, merchant, and amount details from a UPI message
+    Expects a JSON payload with a 'message' key
+    Returns the extracted details
+    """
+    try:
+        # Get the message from the request
+        data = request.get_json(force=True)
+        message = data.get('message', '')
+        
+        if not message:
+            return jsonify({'error': 'No message provided'}), 400
+
+        # Extract details using the UPIMessageExtractor
+        details = message_extractor.predict_details(message)
+        
+        return jsonify(details)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
