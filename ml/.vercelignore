@@ -1,0 +1,9 @@
+*.pkl
+*.csv
+*.json
+*.ipynb
+__pycache__/
+venv/
+node_modules/
+classification_data*
+model.py
